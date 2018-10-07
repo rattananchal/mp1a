@@ -5,13 +5,13 @@ main::start("example.csv");
 
 class main{
 
-    static public function start($filename){
+    static public function start($fileRec){
 
 
 
-        $records = csv::getRecords($filename);
+        $records = csv::getRecords($fileRec);
 
-        $tables = html::generateTable($records);
+        $tables = html::genTable($records);
 
         system::printPage($tables);
 
@@ -21,7 +21,7 @@ class main{
 class html
 {
 
-    public static function generateTable($records){
+    public static function genTable($records){
 
         $table = '<table class="table table-striped" border="1">';
 
@@ -83,15 +83,15 @@ class csv{
 
         while(! feof($file))
         {
-            $record=fgetcsv($file);
+            $line=fgetcsv($file);
 
             if($count==0) {
 
-                $fieldNames = $record;
+                $fieldNames = $line;
                 $records[] = recordFactory::create($fieldNames, $fieldNames);
             }
             else {
-                $records[] = recordFactory::create($fieldNames, $record);
+                $records[] = recordFactory::create($fieldNames, $line);
             }
             $count++;
         }
@@ -107,10 +107,10 @@ class record{
 
     public function __construct(Array $fieldNames = null , $values = null){
 
-        $record = array_combine($fieldNames, $values);
+        $arrayComb = array_combine($fieldNames, $values);
 
-        foreach ($record as $property => $value) {
-            $this->createProperty($property, $value);
+        foreach ($arrayComb as $property => $value) {
+            $this->createProp($property, $value);
         }
     }
     public function ReturnArray(){
@@ -120,7 +120,7 @@ class record{
         return $array;
     }
 
-    public function createProperty($name = 'First', $value = 'Pritam'){
+    public function createProp($name = 'First', $value = 'Anchal'){
         $this->{$name} = $value;
     }
 
