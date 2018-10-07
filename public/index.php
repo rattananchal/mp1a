@@ -1,123 +1,147 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: anchal
- * Date: 10/4/18
- * Time: 2:37 PM
- */
+
+
+main::start("example.csv");
+
+class main{
+
+    static public function start($filename){
 
 
 
-main :: start();
-class main
-{
-    public static function start ()
-    {
-        echo "test";
-        $filerecev = "example.csv";
+        $records = csv::getRecords($filename);
 
-        $records = csv :: getRecords ($filerecev);
-        //$rec = recordFactory::create();
+        $tables = html::generateTable($records);
 
-        $table = html :: genTable ($records);
+        system::printPage($tables);
 
-
-        //print_r($records);
-        //print_r($rec);
-
-    }
-}
-
-class csv
-{
-    public static function getRecords($filename)
-    {
-        $file = fopen($filename, "r");
-        $fieldOne = array() ;
-        $count = 0;
-        while (! feof ($file))
-        {
-            $curLine = fgetcsv($file);
-
-            if ($count == 0)
-                $fieldOne = $curLine;
-            else
-                $lines[] = recordFactory::create($fieldOne, $curLine);
-
-            $count++;
-        }
-        fclose ($file);
-        return($lines);
     }
 }
 
 class html
 {
-    public static function genTable ( $records )
+
+    public static function generateTable($records){
+
+        $table = '<table class="table table-striped" border="1">';
+
+        $table .= row::tableRow($records);
+        $table .= '</table>';
+        return $table;
+    }
+
+}
+
+
+
+class row{
+    public  static function tableRow($records)
     {
+        $i=0;
+        $flag = true;
+        $table = "";
+        foreach ($records as $key => $value) {
+            $table .= "<tr class= \"<?=($i++%2==1) ? 'odd'  : ''; ?>\">";
+            foreach ($value as $key2 => $value2) {
+                if($flag){
+                    $table .= "<th>".htmlspecialchars($value2)."</th>";
+
+                }else{
+                    $table .= '<td>' . htmlspecialchars($value2) . '</td>';
+                }
+            }
+            $flag = false;
+            $table .= "</tr>";
+        }
+
+        return $table;
+
+    }
+}
+
+class tableFactory{
+
+    public static function build(Array $row = null, Array $values  = null)
+    {
+
+        $table =new table($row , $values);
+
+        return $table;
+
+    }
+
+}
+
+
+class csv{
+
+    public static function getRecords($filename){
+
+        $file = fopen($filename,"r");
+        $fieldNames = array();
         $count = 0;
 
-        foreach ($records as $rec)
+        while(! feof($file))
         {
-            if ($count ==0)
-            {
-                $ar = $rec->retArray();
-                $field = array_keys($ar);
-                $fvalue = array_values($ar);
-                print_r($field);
-                print_r($fvalue);
+            $record=fgetcsv($file);
+
+            if($count==0) {
+
+                $fieldNames = $record;
+                $records[] = recordFactory::create($fieldNames, $fieldNames);
             }
-            else
-            {
-                $ar = $rec->retArray();
-                $fvalue = array_values($ar);
-                print_r($fvalue);
+            else {
+                $records[] = recordFactory::create($fieldNames, $record);
             }
-           $count ++;
-            /* $key = array_keys($ar);
-            print_r($key); */
+            $count++;
         }
+
+        fclose($file);
+
+        return $records;
+
     }
 }
 
+class record{
 
-class record {
-    public function __construct(Array $fieldNames = null, $rec = null)
-    {   /*print_r($fieldNames);
-        print_r($values);
-        */
-        $arrayCom = array_combine($fieldNames, $rec);
+    public function __construct(Array $fieldNames = null , $values = null){
 
-        foreach ($arrayCom as $property => $value)
-        {
-            $this -> createProp($property, $value);
+        $record = array_combine($fieldNames, $values);
+
+        foreach ($record as $property => $value) {
+            $this->createProperty($property, $value);
         }
-        /*print_r($arrayCom);
-        $this -> createProp();
-        print_r($this); */
+    }
+    public function ReturnArray(){
 
+        $array= (array) $this;
+
+        return $array;
     }
 
-    public function retArray ()
-    {
-        $array = (array) $this ;
-        return $array ;
+    public function createProperty($name = 'First', $value = 'Pritam'){
+        $this->{$name} = $value;
     }
 
-    public function createProp ($name ='First', $value = 'Keith')
-    {
-        $this -> {$name} = $value ;
-    }
 }
+class recordFactory{
 
-class recordFactory
-{
-       public static function create (Array $fieldNames = null, Array $values = null)
+    public static function create(Array $fieldnames = null, Array $values  = null)
     {
-        $record = new record($fieldNames, $values);
-        //print_r($fieldNames);
-        //print_r($record);
+
+        $record=new record($fieldnames , $values);
+
         return $record;
+
+    }
+
+}
+class system{
+
+    public static function printPage($page){
+
+        echo $page;
     }
 
 }
