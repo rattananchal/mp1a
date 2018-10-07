@@ -18,6 +18,7 @@ class main
 
         $records = csv :: getRecords ($filerecev);
         //$rec = recordFactory::create();
+
         $table = html :: genTable ($records);
 
 
@@ -54,10 +55,27 @@ class html
 {
     public static function genTable ( $records )
     {
+        $count = 0;
+
         foreach ($records as $rec)
         {
-            $ar = $rec->retArray();
-            print_r($ar);
+            if ($count ==0)
+            {
+                $ar = $rec->retArray();
+                $field = array_keys($ar);
+                $fvalue = array_values($ar);
+                print_r($field);
+                print_r($fvalue);
+            }
+            else
+            {
+                $ar = $rec->retArray();
+                $fvalue = array_values($ar);
+                print_r($fvalue);
+            }
+           $count ++;
+            /* $key = array_keys($ar);
+            print_r($key); */
         }
     }
 }
